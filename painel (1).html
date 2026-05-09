@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Painel da Loja — PayJoy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#00C47A;--green-dark:#009B5E;--green-light:#E6FBF3;
+  --red:#FF3B30;--red-light:#FFF0EF;
+  --amber:#FF9500;--amber-light:#FFF8EC;
+  --blue:#0A84FF;--blue-light:#EFF6FF;
+  --bg:#0F1117;--surface:#1A1D24;--s2:#22262F;--s3:#2A2F3A;
+  --border:rgba(255,255,255,0.07);--bstrong:rgba(255,255,255,0.12);
+  --text:#F0F2F5;--text2:#9AA3B2;--text3:#5C6475;
+  --radius:16px;--rsm:10px;--shadow:0 2px 20px rgba(0,0,0,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.lbox{background:var(--surface);border-radius:20px;border:1px solid var(--border);padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--shadow);text-align:center}
+.llogo{width:52px;height:52px;background:var(--green);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.llogo svg{width:26px;height:26px}
+.ltitle{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.lsub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.llabel{display:block;font-size:11.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;text-align:left}
+.linput{width:100%;padding:12px 14px;border:1.5px solid var(--bstrong);border-radius:10px;background:var(--s2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .15s}
+.linput:focus{border-color:var(--green)}
+.linput::placeholder{color:var(--text3)}
+.btn-login{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:background .18s}
+.btn-login:hover{background:var(--green-dark)}
+.lerr{font-size:12.5px;color:var(--red);margin-top:8px;display:none}
+.lerr.show{display:block}
+/* PAINEL */
+#painelScreen{display:none}
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-icon{width:30px;height:30px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:15px;height:15px}
+.logo-name{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.logo-name span{color:var(--green)}
+.hright{display:flex;align-items:center;gap:10px}
+/* realtime dot */
+.live-dot{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--green);font-weight:500}
+.live-dot .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,196,122,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(0,196,122,0)}}
+.btn-logout{padding:6px 12px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text3);font-size:12px;cursor:pointer;transition:all .15s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+/* MAIN */
+main{max-width:960px;margin:0 auto;padding:24px 16px 48px}
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.scard{background:var(--surface);border-radius:var(--rsm);border:1px solid var(--border);padding:16px}
+.scard .sl{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.scard .sn{font-family:'Sora',sans-serif;font-size:28px;font-weight:700;color:var(--text);transition:all .3s}
+.scard .ss{font-size:11.5px;color:var(--text3);margin-top:3px}
+.scard.g .sn{color:var(--green)}.scard.r .sn{color:var(--red)}.scard.a .sn{color:var(--amber)}
+/* ALERT BANNER */
+.abanner{background:rgba(255,149,0,0.1);border:1px solid rgba(255,149,0,0.25);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--amber);margin-bottom:14px;display:none;align-items:center;gap:8px}
+.abanner.show{display:flex}
+/* FILTER ROW */
+.frow{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.stitle{font-family:'Sora',sans-serif;font-size:15px;font-weight:600;color:var(--text);flex:1}
+.fbtn{padding:6px 13px;border-radius:20px;border:1px solid var(--bstrong);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fbtn:hover{background:var(--s2)}
+.fbtn.fa{background:var(--green);border-color:var(--green);color:#fff}
+.fbtn.fr{background:var(--red);border-color:var(--red);color:#fff}
+.fbtn.fp{background:var(--amber);border-color:var(--amber);color:#fff}
+.sinput{padding:7px 13px;background:var(--s2);border:1px solid var(--bstrong);border-radius:20px;color:var(--text);font-size:12.5px;width:170px;outline:none;transition:border-color .15s}
+.sinput:focus{border-color:var(--green)}
+.sinput::placeholder{color:var(--text3)}
+/* TABLE */
+.twrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.thead{display:grid;grid-template-columns:2fr 1.3fr 1.2fr 1fr 1.1fr 90px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--s2)}
+.th{font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--text3)}
+.trow{display:grid;grid-template-columns:2fr 1.3fr 1.2fr 1fr 1.1fr 90px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .12s;cursor:pointer}
+.trow:last-child{border-bottom:none}
+.trow:hover{background:var(--s2)}
+.td{font-size:13px;color:var(--text2)}
+.tname{font-weight:500;color:var(--text);font-size:13.5px}
+.tcpf{font-family:monospace;font-size:11.5px;color:var(--text3)}
+.tdate{font-size:11px;color:var(--text3);margin-top:2px}
+/* PILLS */
+.spill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.sp-a{background:rgba(0,196,122,.15);color:var(--green)}
+.sp-r{background:rgba(255,59,48,.15);color:var(--red)}
+.sp-p{background:rgba(255,149,0,.15);color:var(--amber)}
+.sp-d{background:rgba(10,132,255,.15);color:var(--blue)}
+.tpill{font-family:'Sora',sans-serif;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.tp-ok{background:rgba(0,196,122,.12);color:var(--green)}
+.tp-warn{background:rgba(255,149,0,.12);color:var(--amber)}
+.tp-exp{background:rgba(255,59,48,.12);color:var(--red)}
+.btn-ws{padding:5px 10px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.25);border-radius:7px;color:#25D366;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-ws:hover{background:rgba(37,211,102,.22)}
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty .ei{font-size:40px;margin-bottom:12px;display:block}
+/* MODAL */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;padding:20px}
+.moverlay.open{display:flex}
+.modal{background:var(--surface);border-radius:20px;border:1px solid var(--bstrong);padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.mtitle{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.drow:last-of-type{border-bottom:none}
+.dlabel{font-size:12px;color:var(--text3)}
+.dval{font-size:13px;font-weight:500;color:var(--text);text-align:right}
+.btn-wpp-m{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:12px;background:#25D366;border:none;border-radius:9px;font-family:'Sora',sans-serif;font-size:13.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s}
+.btn-wpp-m:hover{background:#1ebe5d}
+.btn-close{display:block;width:100%;margin-top:8px;padding:11px;border:1px solid var(--bstrong);border-radius:9px;background:transparent;font-family:'Sora',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;color:var(--text2)}
+.btn-close:hover{background:var(--s2)}
+/* NEW BADGE */
+.new-badge{display:inline-block;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
+@media(max-width:700px){
+  .sgrid{grid-template-columns:1fr 1fr}
+  .thead{display:none}
+  .trow{grid-template-columns:1fr;gap:4px;padding:12px 14px}
+  .td:nth-child(n+3){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="lbox">
+    <div class="llogo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+    <div class="ltitle">Painel da Loja</div>
+    <div class="lsub">Acesso restrito ao lojista · PayJoy</div>
+    <label class="llabel" for="lu">Usuário</label>
+    <input class="linput" type="text" id="lu" placeholder="loja" autocomplete="username"/>
+    <label class="llabel" for="lp">Senha</label>
+    <input class="linput" type="password" id="lp" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="btn-login" onclick="login()">Entrar no painel</button>
+    <div class="lerr" id="lerr">Usuário ou senha incorretos.</div>
+    <p style="font-size:11px;color:var(--text3);margin-top:16px;line-height:1.6">Padrão: usuário <strong style="color:var(--text2)">loja</strong> · senha <strong style="color:var(--text2)">payjoy2025</strong><br/>Altere a senha no Firebase Console após configurar.</p>
+  </div>
+</div>
+
+<!-- PAINEL -->
+<div id="painelScreen">
+  <header>
+    <div class="logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+      <span class="logo-name">Pay<span>Joy</span> · Painel</span>
+    </div>
+    <div class="hright">
+      <span class="live-dot"><span class="dot"></span> Tempo real</span>
+      <button class="btn-logout" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="abanner" id="abanner">⚠️ <span id="abannerMsg"></span></div>
+
+    <div class="sgrid">
+      <div class="scard"><div class="sl">Total hoje</div><div class="sn" id="st-tot">0</div><div class="ss">consultas</div></div>
+      <div class="scard g"><div class="sl">Aprovados</div><div class="sn" id="st-aprov">0</div><div class="ss">crédito liberado</div></div>
+      <div class="scard r"><div class="sl">Reprovados</div><div class="sn" id="st-reprov">0</div><div class="ss">não aprovados</div></div>
+      <div class="scard a"><div class="sl">Em análise</div><div class="sn" id="st-pend">0</div><div class="ss">aguardando</div></div>
+    </div>
+
+    <div class="frow">
+      <span class="stitle" id="stitle">Consultas recentes</span>
+      <input class="sinput" type="text" placeholder="🔍 Buscar nome ou CPF..." id="srch" oninput="renderTabela()"/>
+      <button class="fbtn fa" id="fb-t" onclick="setF('todos',this)">Todos</button>
+      <button class="fbtn" id="fb-a" onclick="setF('aprovado',this)">✅ Aprovados</button>
+      <button class="fbtn" id="fb-r" onclick="setF('reprovado',this)">❌ Reprovados</button>
+      <button class="fbtn" id="fb-p" onclick="setF('pendente',this)">⏳ Análise</button>
+    </div>
+
+    <div class="twrap">
+      <div class="thead">
+        <span class="th">Cliente</span>
+        <span class="th">Celular desejado</span>
+        <span class="th">WhatsApp cliente</span>
+        <span class="th">Status</span>
+        <span class="th">Validade 48h</span>
+        <span class="th">Chamar</span>
+      </div>
+      <div id="tbody"></div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="moverlay" id="moverlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="mtitle" id="mtitle">Detalhes</div>
+    <div id="mbody"></div>
+    <button class="btn-wpp-m" id="mwpp" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Chamar no WhatsApp
+    </button>
+    <button class="btn-close" onclick="fecharModal()">Fechar</button>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy, limit, Timestamp }
+                               from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ══════════════════════════════════════════════
+   COLE AQUI AS MESMAS CREDENCIAIS DO index.html
+   ══════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDX-wXYLFohkJ8-UKAwxe9pOBV03ANsej4",
+  authDomain: "payjoy-a8062.firebaseapp.com",
+  projectId: "payjoy-a8062",
+  storageBucket: "payjoy-a8062.firebasestorage.app",
+  messagingSenderId: "1014415694529",
+  appId: "1:1014415694529:web:be8e4f5a4ec1c8a0e71240"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+window.__fb2 = { db, collection, onSnapshot, query, orderBy, limit, Timestamp, ready: true };
+</script>
+
+<script>
+var CREDS = { user:'loja', pass:'payjoy2025' };
+var registros = [];
+var filtro = 'todos';
+var detalheAtual = null;
+var listaFiltrada = [];
+var isNew = {};          // track IDs novos p/ badge
+var unsubscribe = null;
+
+/* ── LOGIN ── */
+function login(){
+  var u=document.getElementById('lu').value.trim();
+  var p=document.getElementById('lp').value;
+  if(u===CREDS.user && p===CREDS.pass){
+    sessionStorage.setItem('pj_auth','1');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('painelScreen').style.display='block';
+    iniciarListener();
+  } else {
+    document.getElementById('lerr').classList.add('show');
+  }
+}
+function sair(){ if(unsubscribe) unsubscribe(); sessionStorage.removeItem('pj_auth'); location.reload(); }
+
+if(sessionStorage.getItem('pj_auth')==='1'){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('painelScreen').style.display='block';
+  setTimeout(iniciarListener, 500);
+}
+
+/* ── LISTENER TEMPO REAL ── */
+function iniciarListener(){
+  if(!window.__fb2||!window.__fb2.ready){ setTimeout(iniciarListener,400); return; }
+  var q = window.__fb2.query(
+    window.__fb2.collection(window.__fb2.db,'consultas'),
+    window.__fb2.orderBy('criadoEm','desc'),
+    window.__fb2.limit(200)
+  );
+  unsubscribe = window.__fb2.onSnapshot(q, function(snap){
+    var novos = [];
+    snap.docChanges().forEach(function(change){
+      if(change.type==='added') isNew[change.doc.id]=true;
+    });
+    var lista=[];
+    snap.forEach(function(doc){
+      var d=doc.data();
+      lista.push({
+        id: doc.id,
+        nome: d.nome||'(não informado)',
+        cpf:  d.cpf||'—',
+        tel:  d.tel||'—',
+        celular: d.celular||'(não informado)',
+        status: d.status||'—',
+        criadoEm: d.criadoEm ? d.criadoEm.toDate() : new Date(),
+        expiraEm: d.expiraEm ? d.expiraEm.toDate() : null
+      });
+    });
+    registros = lista;
+    atualizarStats();
+    renderTabela();
+    verificarAlertas();
+  }, function(err){ console.error('Listener erro:', err); });
+}
+
+/* ── STATS ── */
+function atualizarStats(){
+  var hoje=new Date().toDateString();
+  var h=registros.filter(function(r){ return r.criadoEm.toDateString()===hoje; });
+  document.getElementById('st-tot').textContent=h.length;
+  document.getElementById('st-aprov').textContent=h.filter(function(r){return r.status==='aprovado';}).length;
+  document.getElementById('st-reprov').textContent=h.filter(function(r){return r.status==='reprovado';}).length;
+  document.getElementById('st-pend').textContent=h.filter(function(r){return r.status==='pendente';}).length;
+}
+
+/* ── FILTRO ── */
+function setF(f, btn){
+  filtro=f;
+  document.querySelectorAll('.fbtn').forEach(function(b){ b.className='fbtn'; });
+  var c=f==='aprovado'?'fbtn fa':f==='reprovado'?'fbtn fr':f==='pendente'?'fbtn fp':'fbtn fa';
+  btn.className=c;
+  renderTabela();
+}
+
+/* ── TABELA ── */
+var SPill={aprovado:'sp-a',reprovado:'sp-r',pendente:'sp-p',duvida:'sp-d'};
+var SLabel={aprovado:'✅ Aprovado',reprovado:'❌ Reprovado',pendente:'⏳ Em análise',duvida:'❓ Com dúvida'};
+
+function tempoR(expira){
+  if(!expira) return {txt:'—',cls:''};
+  var d=expira-Date.now();
+  if(d<=0) return {txt:'Expirado',cls:'tp-exp'};
+  var h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000);
+  var cls=d<6*3600000?'tp-warn':'tp-ok';
+  return {txt:h+'h '+m+'min',cls};
+}
+
+function renderTabela(){
+  var busca=document.getElementById('srch').value.toLowerCase();
+  listaFiltrada=registros.filter(function(r){
+    if(filtro!=='todos'&&r.status!==filtro) return false;
+    if(busca&&!r.nome.toLowerCase().includes(busca)&&!r.cpf.includes(busca)) return false;
+    return true;
+  });
+  document.getElementById('stitle').textContent='Consultas recentes ('+listaFiltrada.length+')';
+  if(!listaFiltrada.length){
+    document.getElementById('tbody').innerHTML='<div class="empty"><span class="ei">📋</span><p>Nenhuma consulta encontrada.</p></div>';
+    return;
+  }
+  var html='';
+  listaFiltrada.forEach(function(r,i){
+    var tr=tempoR(r.expiraEm);
+    var data=r.criadoEm.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    var novo=isNew[r.id]?'<span class="new-badge">NOVO</span>':'';
+    html+='<div class="trow" onclick="abrirDetalhe('+i+')">';
+    html+='<div><div class="tname">'+r.nome+novo+'</div><div class="tcpf">'+r.cpf+'</div><div class="tdate">'+data+'</div></div>';
+    html+='<div class="td">'+r.celular+'</div>';
+    html+='<div class="td">'+(r.tel!=='—'?'<a href="https://wa.me/55'+r.tel.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()" style="color:var(--green);text-decoration:none;font-size:12.5px">'+r.tel+'</a>':'—')+'</div>';
+    html+='<div class="td"><span class="spill '+(SPill[r.status]||'sp-d')+'">'+((SLabel[r.status]||r.status))+'</span></div>';
+    html+='<div class="td">'+(r.status==='aprovado'&&r.expiraEm?'<span class="tpill '+tr.cls+'">'+tr.txt+'</span>':'—')+'</div>';
+    html+='<div class="td"><button class="btn-ws" onclick="event.stopPropagation();chamarWpp('+i+')">WhatsApp</button></div>';
+    html+='</div>';
+  });
+  document.getElementById('tbody').innerHTML=html;
+}
+
+/* ── ALERTAS ── */
+function verificarAlertas(){
+  var expirando=registros.filter(function(r){
+    if(r.status!=='aprovado'||!r.expiraEm) return false;
+    var d=r.expiraEm-Date.now();
+    return d>0&&d<6*3600000;
+  });
+  var b=document.getElementById('abanner');
+  if(expirando.length){
+    document.getElementById('abannerMsg').textContent=expirando.length+' cliente(s) aprovado(s) com menos de 6h de validade! Chame pelo WhatsApp agora.';
+    b.classList.add('show');
+  } else b.classList.remove('show');
+}
+
+/* ── DETALHE ── */
+function abrirDetalhe(i){
+  var r=listaFiltrada[i];
+  detalheAtual=r;
+  delete isNew[r.id];
+  document.getElementById('mtitle').textContent=r.nome;
+  var tr=tempoR(r.expiraEm);
+  var data=r.criadoEm.toLocaleString('pt-BR');
+  var exp=r.expiraEm?r.expiraEm.toLocaleString('pt-BR'):'—';
+  var h='';
+  h+='<div class="drow"><span class="dlabel">CPF</span><span class="dval">'+r.cpf+'</span></div>';
+  h+='<div class="drow"><span class="dlabel">WhatsApp</span><span class="dval">'+r.tel+'</span></div>';
+  h+='<div class="drow"><span class="dlabel">Celular desejado</span><span class="dval">'+r.celular+'</span></div>';
+  h+='<div class="drow"><span class="dlabel">Status</span><span class="dval"><span class="spill '+(SPill[r.status]||'sp-d')+'">'+((SLabel[r.status]||r.status))+'</span></span></div>';
+  h+='<div class="drow"><span class="dlabel">Data da consulta</span><span class="dval">'+data+'</span></div>';
+  if(r.status==='aprovado'){
+    h+='<div class="drow"><span class="dlabel">Validade expira em</span><span class="dval">'+exp+'</span></div>';
+    h+='<div class="drow"><span class="dlabel">Tempo restante</span><span class="dval"><span class="tpill '+tr.cls+'">'+tr.txt+'</span></span></div>';
+  }
+  document.getElementById('mbody').innerHTML=h;
+  var wb=document.getElementById('mwpp');
+  if(r.tel&&r.tel!=='—'){ wb.style.display='flex'; wb.onclick=function(){ chamarWppCliente(r); }; }
+  else wb.style.display='none';
+  document.getElementById('moverlay').classList.add('open');
+}
+function fecharModal(e){ if(!e||e.target===document.getElementById('moverlay')) document.getElementById('moverlay').classList.remove('open'); }
+
+/* ── WPP ── */
+var MWPP={
+  aprovado:'Olá, {n}! 😊 Aqui é da nossa loja, parceira PayJoy.\n\nVimos que você foi *aprovado(a)* para um *{cel}*! 🎉\n\nSua aprovação é válida por *48 horas* e você ainda tem *{t}*. Pode vir até a loja para finalizar? Te esperamos! 🏪',
+  reprovado:'Olá, {n}! 😊 Aqui é da nossa loja, parceira PayJoy.\n\nSabemos que o resultado desta vez não foi o esperado. Mas não desanime — você pode tentar novamente em 30 dias!\n\nSe quiser conversar sobre outras opções, é só responder aqui. 💪',
+  pendente:'Olá, {n}! 😊 Aqui é da nossa loja, parceira PayJoy.\n\nSua análise de crédito ainda está em andamento. Assim que sair o resultado te avisamos! Qualquer dúvida, estamos aqui. 👍',
+  duvida:'Olá, {n}! 😊 Aqui é da nossa loja, parceira PayJoy.\n\nVimos que você teve dúvidas na consulta PayJoy. Podemos te ajudar a entender tudo! É só responder aqui. 😊'
+};
+function chamarWpp(i){ chamarWppCliente(listaFiltrada[i]); }
+function chamarWppCliente(r){
+  var tel=r.tel.replace(/\D/g,'');
+  if(!tel) return;
+  if(tel.length<=11) tel='55'+tel;
+  var tr=tempoR(r.expiraEm);
+  var msg=(MWPP[r.status]||MWPP.duvida).replace('{n}',r.nome).replace('{cel}',r.celular).replace('{t}',tr.txt);
+  window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
+  document.getElementById('moverlay').classList.remove('open');
+}
+
+// atualizar contagens a cada minuto
+setInterval(function(){ renderTabela(); verificarAlertas(); },60000);
+</script>
+</body>
+</html>
